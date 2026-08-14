@@ -20,10 +20,6 @@ from urllib.parse import quote_plus
 import shutil
 
 
-BOT_TOKEN = "8585855339:AAFwTP2TrkhcowYndpfBJwtg6RXnWjunxeE"
-
-# === CONFIGURATION ===
-BOT_TOKEN = "8585855339:AAFwTP2TrkhcowYndpfBJwtg6RXnWjunxeE"
 GROUP_ID = "-1004295828574"
 API_URL = "https://numberpanel.tech/api/otp?count=200"
 POLL_INTERVAL = 10  # Seconds between API checks
