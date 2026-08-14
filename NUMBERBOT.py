@@ -17,18 +17,7 @@ import threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from urllib.parse import quote_plus
 import shutil
-import asyncio
-import re
-import requests
-import phonenumbers
-from phonenumbers import geocoder
-from telegram import Bot, InlineKeyboardMarkup, InlineKeyboardButton
-from telegram.constants import ParseMode
-try:
-    from telegram import CopyTextButton
-except ImportError:
-    CopyTextButton = None
-import os
+
 
 BOT_TOKEN = "8585855339:AAFwTP2TrkhcowYndpfBJwtg6RXnWjunxeE"
 
