@@ -496,23 +496,6 @@ DEFAULT_SETTINGS = {
         "enabled": True,
         "use_scraper": True
     },
-    "TimeSMS": {
-        "name": "TimeSMS",
-        "accounts": [
-            {
-                "id": str(uuid.uuid4()),
-                "username": "",
-                "password": ""
-            }
-        ],
-        "base_url": "https://timesms.org",
-        "login_page_url": "https://timesms.org/login",
-        "login_post_url": "https://timesms.org/signin",
-        "ajax_path": "/agent/res/data_smscdr.php",
-        "check_interval": 5,
-        "timeout": 30,
-        "enabled": True
-    },
     "Konekta": {
         "name": "Konekta",
         "accounts": [
@@ -653,7 +636,7 @@ DEFAULT_SETTINGS = {
 
 def migrate_old_settings(settings):
     migrated = False
-    for site_key in ["GROUP", "Fly sms", "Number_Panel", "Bolt", "iVASMS", "MSI", "proton SMS", "IMS", "Roxy SMS", "TimeSMS", "Konekta", "hadi", "fire", "Seven1Tel", "Gaza SMS", "Km sms", "Grand SMS", "Purple SMS"]:
+    for site_key in ["GROUP", "Fly sms", "Number_Panel", "Bolt", "iVASMS", "MSI", "proton SMS", "IMS", "Roxy SMS", "Konekta", "hadi", "fire", "Seven1Tel", "Gaza SMS", "Km sms", "Grand SMS", "Purple SMS"]:
         if site_key in settings:
             if "username" in settings[site_key] and "accounts" not in settings[site_key]:
                 old_username = settings[site_key]["username"]
@@ -695,9 +678,6 @@ def migrate_old_settings(settings):
         settings["Roxy SMS"] = DEFAULT_SETTINGS["Roxy SMS"].copy()
         migrated = True
 
-    if "TimeSMS" not in settings:
-        settings["TimeSMS"] = DEFAULT_SETTINGS["TimeSMS"].copy()
-        migrated = True
 
     if "Konekta" not in settings:
         settings["Konekta"] = DEFAULT_SETTINGS["Konekta"].copy()
@@ -938,14 +918,6 @@ AJAX_PATH11 = SETTINGS["Konekta"]["ajax_path"]
 HTTP_TIMEOUT11 = SETTINGS["Konekta"]["timeout"]
 CHECK_INTERVAL11 = SETTINGS["Konekta"]["check_interval"]
 
-USERNAME10 = get_first_account("TimeSMS").get("username", "")
-PASSWORD10 = get_first_account("TimeSMS").get("password", "")
-BASE_URL10 = SETTINGS["TimeSMS"]["base_url"]
-LOGIN_PAGE_URL10 = SETTINGS["TimeSMS"]["login_page_url"]
-LOGIN_POST_URL10 = SETTINGS["TimeSMS"]["login_post_url"]
-AJAX_PATH10 = SETTINGS["TimeSMS"]["ajax_path"]
-HTTP_TIMEOUT10 = SETTINGS["TimeSMS"]["timeout"]
-CHECK_INTERVAL10 = SETTINGS["TimeSMS"]["check_interval"]
 
 USERNAME12 = get_first_account("hadi").get("username", "")
 PASSWORD12 = get_first_account("hadi").get("password", "")
@@ -1021,8 +993,6 @@ COOKIES_FILE_SITE6 = "cookies_msi.pkl"
 COOKIES_FILE_SITE7 = "cookies_share.pkl"
 COOKIES_FILE_SITE8 = "cookies_ims.pkl"
 COOKIES_FILE_SITE9 = "cookies_roxy.pkl"
-COOKIES_FILE_SITE10 = "cookies_timesms.pkl"
-COOKIES_FILE_SITE10 = "cookies_timesms.pkl"
 LAST_MESSAGE_FILE = "last_message.txt"
 LAST_MESSAGE_FILE_SITE2 = "last_message_site2.txt"
 LAST_MESSAGE_FILE_SITE3 = "last_message_site3.txt"
@@ -1032,8 +1002,6 @@ LAST_MESSAGE_FILE_SITE6 = "last_message_msi.txt"
 LAST_MESSAGE_FILE_SITE7 = "last_message_share.txt"
 LAST_MESSAGE_FILE_SITE8 = "last_message_ims.txt"
 LAST_MESSAGE_FILE_SITE9 = "last_message_roxy.txt"
-LAST_MESSAGE_FILE_SITE10 = "last_message_timesms.txt"
-LAST_MESSAGE_FILE_SITE10 = "last_message_timesms.txt"
 
 account_scrapers = {}
 account_sessions = {}
@@ -1171,14 +1139,6 @@ session13.headers.update({
 })
 is_logged_in_site13 = False
 last_seen_key_site13 = ""
-session10 = requests.Session()
-session10.headers.update({
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-    "Accept-Language": "en-US,en;q=0.9",
-})
-is_logged_in_site10 = False
-last_seen_key_site10 = ""
 
 session14 = requests.Session()
 session14.headers.update({
@@ -3371,7 +3331,7 @@ def clean_html_site2(text):
 
 
 
-def solve_captcha_timesms(html_content):
+def solve_math_captcha(html_content):
     match = re.search(r'(\d+)\s*([+\-*/])\s*(\d+)\s*=?\s*\?', html_content)
     if match:
         n1, op, n2 = int(match.group(1)), match.group(2), int(match.group(3))
@@ -3380,42 +3340,6 @@ def solve_captcha_timesms(html_content):
         elif op == '*': return str(n1 * n2)
         elif op == '/': return str(n1 // n2) if n2 else '0'
     return None
-
-def login_site10(account=None):
-    global is_logged_in_site10, session10
-    print("[TimeSMS] 🔄 محاولة تسجيل الدخول...")
-    
-    site_key = "TimeSMS"
-    if account:
-        user = account.get("username")
-        pw = account.get("password")
-        sess = requests.Session()
-        sess.headers.update(session10.headers)
-    else:
-        user = USERNAME10
-        pw = PASSWORD10
-        sess = session10
-
-    login_url = SETTINGS[site_key]["login_page_url"]
-    submit_url = SETTINGS[site_key]["login_post_url"]
-
-    try:
-        resp = sess.get(login_url, timeout=15)
-        captcha = solve_captcha_timesms(resp.text)
-        if not captcha:
-            print("[TimeSMS] ❌ فشل حل الكابتشا")
-            return False
-        
-        data = {'username': user, 'password': pw, 'capt': captcha}
-        login_resp = sess.post(submit_url, data=data, headers={'Referer': login_url}, timeout=15, allow_redirects=True)
-        
-        if 'login' not in str(login_resp.url).lower():
-            if not account: is_logged_in_site10 = True
-            print("[TimeSMS] ✅ تم تسجيل الدخول بنجاح")
-            return sess if account else True
-    except Exception as e:
-        print(f"[TimeSMS] ❌ خطأ في تسجيل الدخول: {e}")
-    return False
 
 def login_site14(account=None):
     global is_logged_in_site14, session14
@@ -4811,7 +4735,6 @@ def get_sites_menu():
         InlineKeyboardButton(" proton SMS", callback_data="site_config_proton SMS")
     )
     markup.add(
-        InlineKeyboardButton("🆕 TimeSMS", callback_data="site_config_TimeSMS"),
         InlineKeyboardButton("🔗 Konekta", callback_data="site_config_Konekta")
     )
     markup.add(
@@ -4911,7 +4834,6 @@ def get_accounts_menu():
         InlineKeyboardButton("proton SMS", callback_data="accounts_site_proton SMS")
     )
     markup.add(
-        InlineKeyboardButton("🆕 TimeSMS", callback_data="accounts_site_TimeSMS"),
         InlineKeyboardButton("🔗 Konekta", callback_data="accounts_site_Konekta")
     )
     markup.add(
@@ -9555,16 +9477,6 @@ def site_change_user_callback(call):
     site_key = data_parts[0]
     account_id = data_parts[1] if len(data_parts) > 1 else None
     
-    # Handle TimeSMS special case for single account sites or direct access
-    if not account_id and site_key == "TimeSMS":
-        accounts = get_site_accounts(site_key)
-        if accounts:
-            account = accounts[0]
-            account_id = account.get("id", "")[:8]
-        else:
-            bot.answer_callback_query(call.id, "❌ لا يوجد حساب مسجل", show_alert=True)
-            return
-
     account = get_account_by_id(site_key, account_id) if account_id else None
     
     if not account:
@@ -9597,16 +9509,6 @@ def site_change_pass_callback(call):
     data_parts = call.data.replace("site_change_pass_", "").rsplit("_", 1)
     site_key = data_parts[0]
     account_id = data_parts[1] if len(data_parts) > 1 else None
-    # Handle TimeSMS special case for single account sites or direct access
-    if not account_id and site_key == "TimeSMS":
-        accounts = get_site_accounts(site_key)
-        if accounts:
-            account = accounts[0]
-            account_id = account.get("id", "")[:8]
-        else:
-            bot.answer_callback_query(call.id, "❌ لا يوجد حساب مسجل", show_alert=True)
-            return
-
     account = get_account_by_id(site_key, account_id) if account_id else None
     
     if not account:
@@ -9681,16 +9583,6 @@ def site_test_login_callback(call):
     data_parts = call.data.replace("site_test_login_", "").rsplit("_", 1)
     site_key = data_parts[0]
     account_id = data_parts[1] if len(data_parts) > 1 else None
-    # Handle TimeSMS special case for single account sites or direct access
-    if not account_id and site_key == "TimeSMS":
-        accounts = get_site_accounts(site_key)
-        if accounts:
-            account = accounts[0]
-            account_id = account.get("id", "")[:8]
-        else:
-            bot.answer_callback_query(call.id, "❌ لا يوجد حساب مسجل", show_alert=True)
-            return
-
     account = get_account_by_id(site_key, account_id) if account_id else None
     
     if not account:
@@ -9719,16 +9611,6 @@ def site_test_fetch_callback(call):
     data_parts = call.data.replace("site_test_fetch_", "").rsplit("_", 1)
     site_key = data_parts[0]
     account_id = data_parts[1] if len(data_parts) > 1 else None
-    # Handle TimeSMS special case for single account sites or direct access
-    if not account_id and site_key == "TimeSMS":
-        accounts = get_site_accounts(site_key)
-        if accounts:
-            account = accounts[0]
-            account_id = account.get("id", "")[:8]
-        else:
-            bot.answer_callback_query(call.id, "❌ لا يوجد حساب مسجل", show_alert=True)
-            return
-
     account = get_account_by_id(site_key, account_id) if account_id else None
     
     if not account:
@@ -11517,8 +11399,7 @@ def handle_messages(msg):
         )
         markup.add(
             InlineKeyboardButton("🌸 Roxy SMS", callback_data="na_add_country_srv_Roxy SMS"),
-            InlineKeyboardButton("🆕 TimeSMS", callback_data="na_add_country_srv_TimeSMS")
-        )
+            )
         markup.add(InlineKeyboardButton("🔗 Konekta", callback_data="na_add_country_srv_Konekta"))
         markup.add(InlineKeyboardButton("📡 Seven1Tel", callback_data="na_add_country_srv_Seven1Tel"))
         markup.add(InlineKeyboardButton("🕊 Gaza SMS", callback_data="na_add_country_srv_Gaza SMS"))
@@ -11667,8 +11548,7 @@ def handle_messages(msg):
         )
         markup.add(
             InlineKeyboardButton("🌸 Roxy SMS", callback_data="na_add_country_srv_Roxy SMS"),
-            InlineKeyboardButton("🆕 TimeSMS", callback_data="na_add_country_srv_TimeSMS")
-        )
+            )
         markup.add(InlineKeyboardButton("🔗 Konekta", callback_data="na_add_country_srv_Konekta"))
         markup.add(InlineKeyboardButton("📡 Seven1Tel", callback_data="na_add_country_srv_Seven1Tel"))
         markup.add(InlineKeyboardButton("🕊 Gaza SMS", callback_data="na_add_country_srv_Gaza SMS"))
@@ -15036,8 +14916,6 @@ def start_monitoring_for_account(site_key, account):
         sms_loop_for_ims_account(site_key, account)
     elif site_key == "Roxy SMS":
         sms_loop_for_roxy_account(site_key, account)
-    elif site_key == "TimeSMS":
-        sms_loop_for_timesms_account(site_key, account)
     elif site_key == "Konekta":
         sms_loop_for_konekta_account(site_key, account)
     elif site_key == "Grand SMS":
@@ -15047,201 +14925,6 @@ def start_monitoring_for_account(site_key, account):
     else:
         sms_loop_requests_based(site_key, account)
 
-
-def sms_loop_for_timesms_account(site_key, account):
-    site_name = SETTINGS[site_key]["name"]
-    username = account.get("username")
-    password = account.get("password")
-    account_id = account.get("id")
-    stop_event = account_stop_events.get(f"{site_key}_{account_id}", Event())
-    
-    sess = requests.Session()
-    sess.headers.update({
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-        "Accept-Language": "en-US,en;q=0.9",
-    })
-    is_logged_in = False
-    
-    last_message_file = f"last_message_{site_key}_{account_id}.txt"
-    last_seen_key_local = ""
-    
-    def load_last_seen():
-        nonlocal last_seen_key_local
-        if os.path.exists(last_message_file):
-            try:
-                with open(last_message_file, "r", encoding="utf-8") as f:
-                    last_seen_key_local = f.read().strip()
-            except: pass
-    def save_last_seen():
-        try:
-            with open(last_message_file, "w", encoding="utf-8") as f:
-                f.write(last_seen_key_local)
-        except: pass
-
-    print_monitoring_box(site_name, username, "🚀", "بدء المراقبة...")
-    load_last_seen()
-    
-    base_url = SETTINGS[site_key]["base_url"]
-    login_url = SETTINGS[site_key]["login_page_url"]
-    submit_url = SETTINGS[site_key]["login_post_url"]
-    smscdr_page_url = base_url + "/agent/SMSCDRReports"
-    ajax_url = base_url + "/agent/res/data_smscdr.php"
-    current_sesskey = None
-    
-    while not stop_event.is_set():
-        try:
-            if not is_logged_in:
-                resp = sess.get(login_url, timeout=15)
-                captcha = solve_captcha_timesms(resp.text)
-                if captcha:
-                    csrf_token = None
-                    cm = re.search(r"""name=["']_token["'][^>]*value=["']([^"']+)["']""", resp.text) or \
-                         re.search(r"""value=["']([^"']+)["'][^>]*name=["']_token["']""", resp.text)
-                    if cm:
-                        csrf_token = cm.group(1)
-                    login_data = {'username': username, 'password': password, 'capt': captcha}
-                    if csrf_token:
-                        login_data['_token'] = csrf_token
-                    login_headers = {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                        'Origin': base_url,
-                        'Referer': login_url,
-                    }
-                    login_resp = sess.post(submit_url, data=login_data, headers=login_headers, timeout=15, allow_redirects=True)
-                    final_url = str(login_resp.url).lower()
-                    if 'agent' in final_url or ('login' not in final_url and 'signin' not in final_url):
-                        is_logged_in = True
-                        print_monitoring_box(site_name, username, "✅", "تم تسجيل الدخول بنجاح")
-                        try:
-                            page = sess.get(smscdr_page_url, timeout=15)
-                            sk = re.search(r'sesskey=([A-Za-z0-9=]+)', page.text)
-                            if sk:
-                                current_sesskey = sk.group(1)
-                        except Exception:
-                            pass
-                    else:
-                        print_monitoring_box(site_name, username, "❌", "فشل تسجيل الدخول")
-                        time.sleep(30); continue
-                else:
-                    print_monitoring_box(site_name, username, "❌", "فشل حل الكابتشا")
-                    time.sleep(30); continue
-
-            today = datetime.now()
-            fdate1 = today.strftime('%Y-%m-%d') + " 00:00:00"
-            fdate2 = today.strftime('%Y-%m-%d') + " 23:59:59"
-            params = {
-                'fdate1': fdate1, 'fdate2': fdate2,
-                'frange': '', 'fclient': '', 'fnum': '', 'fcli': '',
-                'fgdate': '', 'fgmonth': '', 'fgrange': '', 'fgclient': '', 'fgnumber': '', 'fgcli': '',
-                'fg': '0',
-            }
-            if current_sesskey:
-                params['sesskey'] = current_sesskey
-            else:
-                params.update({'sEcho': '1', 'iDisplayStart': '0', 'iDisplayLength': '500', 'iSortCol_0': '0', 'sSortDir_0': 'desc'})
-            
-            r = sess.get(ajax_url, params=params, headers={
-                'Accept': 'application/json, text/javascript, */*; q=0.01',
-                'Referer': smscdr_page_url,
-                'X-Requested-With': 'XMLHttpRequest'
-            }, timeout=30)
-            if r.status_code != 200 or 'login' in r.url.lower():
-                try:
-                    page = sess.get(smscdr_page_url, timeout=15)
-                    if 'login' in page.url.lower():
-                        is_logged_in = False; current_sesskey = None; continue
-                    sk = re.search(r'sesskey=([A-Za-z0-9=]+)', page.text)
-                    if sk:
-                        current_sesskey = sk.group(1)
-                        time.sleep(1); continue
-                except Exception:
-                    pass
-                is_logged_in = False; current_sesskey = None; continue
-
-            try:
-                data = r.json()
-            except Exception as e:
-                print(f"[{site_name}] JSON Decode Error: {e}")
-                is_logged_in = False; continue
-                
-            rows = data.get('aaData', [])
-            
-            if rows:
-                new_messages = []
-                try:
-                    rows.sort(key=lambda x: str(x[0]).strip() if len(x) > 0 else "", reverse=True)
-                except:
-                    pass
-                
-                for row in rows:
-                    if len(row) >= 6:
-                        msg_date = str(row[0]).strip()
-                        msg_num = str(row[2]).strip()
-                        msg_cli = str(row[3]).strip()
-                        msg_text = str(row[5]).strip()
-                        
-                        if not re.match(r'\d{4}-\d{2}-\d{2}', msg_date):
-                            continue
-
-                        if msg_text == "$" or len(msg_text) < 2:
-                            for idx in [4, 6, 3]: 
-                                if len(row) > idx:
-                                    potential_msg = str(row[idx]).strip()
-                                    if potential_msg and potential_msg != "$":
-                                        msg_text = potential_msg
-                                        break
-                        
-                        msg_key = f"{msg_date}_{msg_num}_{msg_text[:20]}"
-                        if msg_key == last_seen_key_local: break
-                        new_messages.append({'date': msg_date, 'number': msg_num, 'cli': msg_cli, 'sms': msg_text, 'key': msg_key})
-                
-                if new_messages:
-                    is_initial = not os.path.exists(last_message_file) or os.path.getsize(last_message_file) == 0
-                    last_seen_key_local = new_messages[0]['key']
-                    save_last_seen()
-                    
-                    if is_initial:
-                        print_monitoring_box(site_name, username, "🔔", "تم بدء المراقبة: جلب أحدث كود فقط")
-                        messages_to_process = [new_messages[0]]
-                    else:
-                        print_monitoring_box(site_name, username, "🔔", f"لقيت كود: {len(new_messages)} رسائل جديدة")
-                        messages_to_process = reversed(new_messages)
-                    
-                    for msg in messages_to_process:
-                        otp_val, clean_sms = extract_from_message(msg['sms'])
-                        service_name = f"[{detect_service(clean_sms)}]"
-                        formatted = format_otp_message_v2(msg['number'], clean_sms, service_name, otp_val)
-                        send_otp_to_user(clean_number(msg['number']), formatted, msg['number'], None, otp_val, clean_sms, service_name)
-                        
-                        sent_file = f"sent_messages_{site_key}_{account_id}.json"
-                        try:
-                            sent_msgs = []
-                            if os.path.exists(sent_file):
-                                with open(sent_file, 'r', encoding='utf-8') as f:
-                                    sent_msgs = json.load(f)
-                            sent_msgs.append({
-                                'date': msg['date'],
-                                'number': msg['number'],
-                                'text': msg['sms'],
-                                'otp': otp_val,
-                                'timestamp': time.time()
-                            })
-                            if len(sent_msgs) > 100:
-                                sent_msgs = sent_msgs[-100:]
-                            with open(sent_file, 'w', encoding='utf-8') as f:
-                                json.dump(sent_msgs, f, indent=2, ensure_ascii=False)
-                        except Exception as e:
-                            print(f"[{site_name}] Error saving sent messages: {e}")
-                else:
-                    print_monitoring_box(site_name, username, "🟢", "لا توجد اكواد")
-            else:
-                print_monitoring_box(site_name, username, "🟢", "لا توجد اكواد")
-
-        except Exception as e:
-            print(f"[{site_name}] Error: {e}")
-            is_logged_in = False
-        time.sleep(SETTINGS[site_key].get("check_interval", 5))
 
 def sms_loop_for_konekta_account(site_key, account):
     site_name = SETTINGS[site_key]["name"]
@@ -15285,7 +14968,7 @@ def sms_loop_for_konekta_account(site_key, account):
         try:
             if not is_logged_in:
                 resp = sess.get(login_url, timeout=20, verify=False)
-                captcha = solve_captcha_timesms(resp.text)
+                captcha = solve_math_captcha(resp.text)
                 if captcha:
                     data = {'username': username, 'password': password, 'capt': captcha}
                     login_resp = sess.post(submit_url, data=data, headers={'Referer': login_url}, timeout=20, allow_redirects=True, verify=False)
@@ -15771,7 +15454,6 @@ def _build_server_markup(prefix):
     )
     markup.add(
         InlineKeyboardButton("🌸 Roxy SMS", callback_data=f"{prefix}_Roxy SMS"),
-        InlineKeyboardButton("🆕 TimeSMS", callback_data=f"{prefix}_TimeSMS")
     )
     markup.add(InlineKeyboardButton("🔗 Konekta", callback_data=f"{prefix}_Konekta"))
     markup.add(InlineKeyboardButton("📡 Seven1Tel", callback_data=f"{prefix}_Seven1Tel"))
@@ -16807,7 +16489,7 @@ if __name__ == "__main__":
     monitoring_threads = []
     print("🚀 بدء تشغيل نظام المراقبة متعدد الحسابات...")
     
-    for site_key in ["GROUP", "Fly sms", "Number_Panel", "Bolt", "iVASMS", "MSI", "proton SMS", "IMS", "Roxy SMS", "TimeSMS", "Konekta", "hadi", "fire", "Seven1Tel", "Gaza SMS", "Km sms", "Grand SMS", "Purple SMS"]:
+    for site_key in ["GROUP", "Fly sms", "Number_Panel", "Bolt", "iVASMS", "MSI", "proton SMS", "IMS", "Roxy SMS", "Konekta", "hadi", "fire", "Seven1Tel", "Gaza SMS", "Km sms", "Grand SMS", "Purple SMS"]:
         if SETTINGS[site_key]["enabled"]:
             accounts = get_site_accounts(site_key)
             site_name = SETTINGS[site_key]["name"]
