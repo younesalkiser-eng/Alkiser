@@ -108,12 +108,7 @@ async def send_to_group(bot, entry):
         print(f"✅ Sent OTP for {num} - {service}")
     except Exception as e:
         print(f"❌ Failed to send to group: {e}")
-
-async def main():
-bot_token = telebot.TeleBot(BOT_TOKEN)
-    seen_otps = set()
     
-    print("🚀 Starting Forwarder Bot...")
     
     # Initial fetch to prevent sending old OTPs
     try:
