@@ -90,10 +90,10 @@ async def send_to_group(bot, entry):
         row1 = [InlineKeyboardButton(text=f"🔑 {otp}", callback_data="noop")]
         
     row2 = [
-        InlineKeyboardButton(text="Methods", url="https://youtube.com/@xclusor", icon_custom_emoji_id="5807797645443340724"),
-        InlineKeyboardButton(text="Channel", url="https://whatsapp.com/channel/0029VbC0kzIEFeXq9XLgHZ3y", icon_custom_emoji_id="5429571366384842791")
+        InlineKeyboardButton(text="Methods", url="https://t.me/youk_711", icon_custom_emoji_id="5807797645443340724"),
+        InlineKeyboardButton(text="Channel", url="https://t.me/you_k711", icon_custom_emoji_id="5429571366384842791")
     ]
-    row3 = [InlineKeyboardButton(text="OTP Panel", url="https://t.me/XclusoRPanelBot", icon_custom_emoji_id="5372917041193828849")]
+    row3 = [InlineKeyboardButton(text="OTP Panel", url="https://t.me/youk711", icon_custom_emoji_id="5372917041193828849")]
     
     markup = InlineKeyboardMarkup([row1, row2, row3])
     
@@ -110,7 +110,7 @@ async def send_to_group(bot, entry):
         print(f"❌ Failed to send to group: {e}")
 
 async def main():
-    bot = Bot(token=BOT_TOKEN)
+bot = telebot.TeleBot(BOT_TOKEN)
     seen_otps = set()
     
     print("🚀 Starting Forwarder Bot...")
