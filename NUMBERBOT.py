@@ -110,7 +110,7 @@ async def send_to_group(bot, entry):
         print(f"❌ Failed to send to group: {e}")
 
 async def main():
-bot = telebot.TeleBot(BOT_TOKEN)
+bot_token = telebot.TeleBot(BOT_TOKEN)
     seen_otps = set()
     
     print("🚀 Starting Forwarder Bot...")
