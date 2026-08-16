@@ -43,7 +43,7 @@ IVASMS_DASHBOARD = {
 # ======================
 USERNAME = "younesalkiser"
 PASSWORD = "y779225741@"
-BOT_TOKEN = "7081300039:AAFo4xJed0u0iZNJnmUpVUn3MTAv0vqOWsk"
+BOT_TOKEN = "8585855339:AAFwTP2TrkhcowYndpfBJwtg6RXnWjunxeE"
 CHAT_IDS = [
     "-1004295828574",
 ]
