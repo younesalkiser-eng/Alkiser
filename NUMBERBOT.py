@@ -1999,7 +1999,7 @@ def delete_message_after_delay(chat_id, message_id, delay=150):
     """تحذف الرسالة بعد مرور delay ثانية"""
     time.sleep(delay)
     try:
-        url = f"https://api.telegram.org/bot{BOT_TOKEN}/deleteMessage"
+        url = "https://api.telegram.org/bot{BOT_TOKEN}/deleteMessage"
         payload = {"chat_id": chat_id, "message_id": message_id}
         requests.post(url, data=payload)
     except Exception as e:
@@ -2030,7 +2030,7 @@ def send_to_telegram_group(text, otp_code):
         print(f"❌ خطأ في إعداد الأزرار: {e}")
         return False
 
-    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
+    url = "https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
     
     for chat_id in CHAT_IDS:
         try:
