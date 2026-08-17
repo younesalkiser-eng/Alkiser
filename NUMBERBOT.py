@@ -43,7 +43,7 @@ IVASMS_DASHBOARD = {
 # ======================
 USERNAME = "younesalkiser"
 PASSWORD = "y779225741@"
-BOT_TOKEN = "8585855339:AAF-Rx8dhg5MqcljBJhi8RxC9QM7znAosl0"
+BOT_TOKEN = "7081300039:AAFo4xJed0u0iZNJnmUpVUn3MTAv0vqOWsk"
 CHAT_IDS = [
     "-1004295828574",
 ]
@@ -1999,7 +1999,7 @@ def delete_message_after_delay(chat_id, message_id, delay=150):
     """تحذف الرسالة بعد مرور delay ثانية"""
     time.sleep(delay)
     try:
-        url = "https://api.telegram.org/bot{BOT_TOKEN}/deleteMessage"
+        url = f"https://api.telegram.org/bot{BOT_TOKEN}/deleteMessage"
         payload = {"chat_id": chat_id, "message_id": message_id}
         requests.post(url, data=payload)
     except Exception as e:
@@ -2020,8 +2020,15 @@ def send_to_telegram_group(text, otp_code):
                     {"text": "🤖 𝐁𝐎𝐓 𝐏𝐀𝐍𝐄𝑳 ↗️", "url": "@you_k711"}
                 ],
                 
-                # الصف الثالث: زر المطور
+                # الصف الثالث: روابط Methods وWhatsApp Channel من forward.py
                 [
+                    {"text": "Methods", "url": "https://t.me/youk_711"},
+                    {"text": "Channel", "url": "https://t.me/you_k711"}
+                ],
+
+                # الصف الرابع: رابط لوحة OTP من forward.py مع الحفاظ على رابط المطور الأصلي
+                [
+                    {"text": "OTP Panel", "url": "https://t.me/yk711Bot"},
                     {"text": "يونس القيصر ↗️", "url": "يونس القيصر "}
                 ]
             ]
@@ -2030,7 +2037,7 @@ def send_to_telegram_group(text, otp_code):
         print(f"❌ خطأ في إعداد الأزرار: {e}")
         return False
 
-    url = "https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
+    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
     
     for chat_id in CHAT_IDS:
         try:
@@ -2038,7 +2045,8 @@ def send_to_telegram_group(text, otp_code):
                 "chat_id": chat_id,
                 "text": text,
                 "parse_mode": "HTML",
-                "reply_markup": json.dumps(keyboard)
+                "reply_markup": json.dumps(keyboard),
+                "disable_web_page_preview": True
             }
             resp = requests.post(url, data=payload, timeout=10)
             
